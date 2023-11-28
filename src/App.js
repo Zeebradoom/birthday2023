@@ -1,25 +1,19 @@
 import logo from "./logo.svg";
 import "./App.css";
-
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./login";
+import Welcome from "./welcome";
+import Unauthorized from "./unauthorized";
 
 function App() {
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-
-    if (error) console.error("Error logging in:", error);
-  };
-
   return (
-    <div>
-      <button onClick={signInWithGoogle}>Sign in with Google</button>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+      </Routes>
+    </Router>
   );
 }
 
