@@ -1,7 +1,11 @@
-import React from "react";
+import { createClient } from "@supabase/supabase-js";
+import Reac from "react";
 
-function Welcome() {
-  // Function to check if the user is verified
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+function Welcome(email) {
   const styles = {
     partyInvite: {
       textAlign: "center",
@@ -15,19 +19,30 @@ function Welcome() {
       fontSize: "2em",
       marginBottom: "10px",
     },
-    // ... other styles
   };
+
+  async function editValue() {
+    await supabase
+      .from("authed")
+      .insert([{ email: email }])
+      .select();
+  }
 
   return (
     <div style={styles.partyInvite}>
       <div className="party-invite">
         <h1>You are invited to Derrick's 20th birthday party!</h1>
-        <p>It will be on Dec 7 at 8pm on the rooftop of Identity.</p>
-        <p>Msg Derrick when you arrive</p>
+        <p>
+          It will be on Dec 7 at 8pm on the rooftop of Identity. (my birthday is
+          Dec 6 tho but i got NGC stuff lmao){" "}
+        </p>
+
         {/* Include firework animations here */}
 
-        <button> I will come! </button>
+        <button onClick={editValue()}> I will come! </button>
         <button> I will not :( </button>
+
+        <p>Msg Derrick when you arrive</p>
       </div>
     </div>
   );
