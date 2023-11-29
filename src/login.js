@@ -141,8 +141,7 @@ export default function Login() {
             <h1>You are invited to Derrick's 20th birthday party!</h1>
             <p>
               It will be on Dec 7 at 8pm on the rooftop of Identity. (my
-              birthday is Dec 6 tho but i got NGC stuff lmao) Please only click
-              one of the buttons below.
+              birthday is Dec 6 tho but i got NGC stuff lmao)
             </p>
             <button onClick={() => editValue(true)}> I will come! </button>
             <button onClick={() => editValue(false)}> I will not :( </button>
