@@ -51,27 +51,6 @@ export default function Login() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // const [attendees, setAttendees] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchAttendees = async () => {
-  //     try {
-  //       let { data, error } = await supabase
-  //         .from("attendance")
-  //         .select("*")
-  //         .eq("coming", true);
-
-  //       if (error) throw error;
-
-  //       setAttendees(data);
-  //     } catch (error) {
-  //       console.error("Error fetching attendees:", error);
-  //     }
-  //   };
-
-  //   fetchAttendees();
-  // }, []);
-
   const [attendeesComing, setAttendeesComing] = useState([]);
 
   const editValue = async (yes) => {
@@ -109,8 +88,6 @@ export default function Login() {
       }
 
       await fetchAttendeesComing();
-
-      // console.log("here");
 
       if (error) {
         console.error("Error:", error);
