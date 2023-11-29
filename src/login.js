@@ -1,70 +1,192 @@
 import { createClient } from "@supabase/supabase-js";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Auth } from "@supabase/auth-ui-react";
 
 const supabaseUrl = "https://wxiwkxupnytwqnggninu.supabase.co";
 const supabaseAnonKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4aXdreHVwbnl0d3FuZ2duaW51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDA3MTQ4OTQsImV4cCI6MjAxNjI5MDg5NH0.GmyBMR_mdSVofR_dVgEZKt2WoW829RUfFTVOOuDloZ0";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-function Login() {
-  const navigate = useNavigate();
-  let email = "";
-
-  const signInWithGoogle = async () => {
-    let { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-    console.log(data);
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    console.log(user);
-
-    if (error) console.error("Error logging in:", error);
+export default function Login() {
+  const styles = {
+    partyInvite: {
+      textAlign: "center",
+      padding: "20px",
+      backgroundColor: "#f0f0f0",
+      borderRadius: "10px",
+      boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+    },
+    header: {
+      color: "#333",
+      fontSize: "2em",
+      marginBottom: "10px",
+    },
   };
 
-  async function isUserVerified() {
-    console.log("here");
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-    if (error) {
-      console.log("Error fetching user: ", error);
-      return false;
-    }
-    console.log(user);
-    // email = user.email;
-    // const verifiedUsers = [
-    //   "derrick_cui@berkeley.edu",
-    //   "bradley_tian@berkeley.edu",
-    //   "cderrick126@gmail.com",
-    // ]; // Your verified users list
+  const [session, setSession] = useState(null);
 
-    // return verifiedUsers.includes(email);
-    return true;
+  function isUserVerified(email) {
+    const verifiedUsers = [
+      "derrick_cui@berkeley.edu",
+      "bradley_tian@berkeley.edu",
+      "cderrick126@gmail.com",
+    ]; // Your verified users list
+    return verifiedUsers.includes(email);
   }
 
   useEffect(() => {
-    // Check if user is signed in and verified
-    // supabase.auth.onAuthStateChange(async (event, session) => {
-    //   const verified = await isUserVerified();
-    //   if (!verified) {
-    //     navigate("/unauthorized", {}); // Redirect to an unauthorized page
-    //   } else {
-    //     navigate("/welcome", { email }); // Redirect to a welcome page
-    //   }
-    // });
-  });
+    fetchAttendeesComing();
 
-  return (
-    <div>
-      <button onClick={signInWithGoogle}>Sign in with Google</button>
-    </div>
-  );
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // const [attendees, setAttendees] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchAttendees = async () => {
+  //     try {
+  //       let { data, error } = await supabase
+  //         .from("attendance")
+  //         .select("*")
+  //         .eq("coming", true);
+
+  //       if (error) throw error;
+
+  //       setAttendees(data);
+  //     } catch (error) {
+  //       console.error("Error fetching attendees:", error);
+  //     }
+  //   };
+
+  //   fetchAttendees();
+  // }, []);
+
+  const [attendeesComing, setAttendeesComing] = useState([]);
+
+  const editValue = async (yes) => {
+    try {
+      console.log("try");
+
+      // Check if the user already exists in the 'attendance' table
+      let { data: existingUser, error: fetchError } = await supabase
+        .from("attendance")
+        .select("*")
+        .eq("email", session.user.email);
+
+      if (fetchError) {
+        console.error("Error fetching user:", fetchError);
+        return;
+      }
+
+      let data, error;
+
+      if (existingUser && existingUser.length > 0) {
+        // User exists, update their record
+        ({ data, error } = await supabase
+          .from("attendance")
+          .update({ coming: yes, name: session.user.user_metadata.full_name })
+          .eq("email", session.user.email));
+      } else {
+        // User does not exist, insert a new record
+        ({ data, error } = await supabase.from("attendance").insert([
+          {
+            email: session.user.email,
+            coming: yes,
+            name: session.user.user_metadata.full_name,
+          },
+        ]));
+      }
+
+      await fetchAttendeesComing();
+
+      // console.log("here");
+
+      if (error) {
+        console.error("Error:", error);
+      } else {
+        console.log("Data:", data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchAttendeesComing = async () => {
+    let { data, error } = await supabase
+      .from("attendance")
+      .select("*")
+      .eq("coming", true);
+
+    if (error) {
+      console.error("Error fetching attendees:", error);
+      return;
+    }
+
+    setAttendeesComing(data);
+  };
+
+  if (!session) {
+    return (
+      <div>
+        <p>Please only use the Connect Google button lolz</p>
+        <Auth providers={["google"]} supabaseClient={supabase} />
+      </div>
+    );
+  } else {
+    if (isUserVerified(session.user.email)) {
+      return (
+        <div style={styles.partyInvite}>
+          <div className="party-invite">
+            <h1>You are invited to Derrick's 20th birthday party!</h1>
+            <p>
+              It will be on Dec 7 at 8pm on the rooftop of Identity. (my
+              birthday is Dec 6 tho but i got NGC stuff lmao) Please only click
+              one of the buttons below.
+            </p>
+            <button onClick={() => editValue(true)}> I will come! </button>
+            <button onClick={() => editValue(false)}> I will not :( </button>
+            <p>Msg Derrick when you arrive</p>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendeesComing.map((attendee, index) => (
+                  <tr key={index}>
+                    <td>{attendee.name}</td>
+                    <td>Coming</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="unauthorized-container">
+          <h1>Unauthorized</h1>
+          <p>
+            You are not authorized to access this page. You are ugly and I hate
+            you. My balls are itchy.
+          </p>
+        </div>
+      );
+    }
+  }
 }
-
-export default Login;
