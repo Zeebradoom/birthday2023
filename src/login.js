@@ -43,7 +43,8 @@ export default function Login() {
       "bellenichatorn@berkeley.edu",
       "tommyhang@berkeley.edu",
       "trevortrinh@berkeley.edu",
-    ]; // Your verified users list
+      "carolx@berkeley.edu",
+    ];
     return verifiedUsers.includes(email);
   }
 
