@@ -36,6 +36,13 @@ export default function Login() {
       "fogel@berkeley.edu",
       "lawsongraham@berkeley.edu",
       "senahazir@berkeley.edu",
+      "mindytsai@berkeley.edu",
+      "trentchu@berkeley.edu",
+      "elizaveta.belkina@berkeley.edu",
+      "wang_zixun@berkeley.edu",
+      "bellenichatorn@berkeley.edu",
+      "tommyhang@berkeley.edu",
+      "trevortrinh@berkeley.edu",
     ]; // Your verified users list
     return verifiedUsers.includes(email);
   }
