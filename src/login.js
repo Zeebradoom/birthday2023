@@ -31,6 +31,11 @@ export default function Login() {
       "derrick_cui@berkeley.edu",
       "bradley_tian@berkeley.edu",
       "cderrick126@gmail.com",
+      "amelie.sen@berkeley.edu",
+      "wtgerken@berkeley.edu",
+      "fogel@berkeley.edu",
+      "lawsongraham@berkeley.edu",
+      "senahazir@berkeley.edu",
     ]; // Your verified users list
     return verifiedUsers.includes(email);
   }
