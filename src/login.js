@@ -44,6 +44,7 @@ export default function Login() {
       "tommyhang@berkeley.edu",
       "trevortrinh@berkeley.edu",
       "carolx@berkeley.edu",
+      "mayurihebbar@berkeley.edu",
     ];
     return verifiedUsers.includes(email);
   }
